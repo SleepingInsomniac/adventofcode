@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-# Get the first and last digit from the string on each line
-#  - Some lines only have 1 digit, therefore that's the first AND last
-
 sum = 0
 
 File.open(File.join(__dir__, 'input.txt'), 'r') do |file|
