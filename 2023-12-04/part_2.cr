@@ -32,7 +32,7 @@ class Card
   def initialize(@card_id, @winning_numbers, @card_numbers)
   end
 
-  def numbers_won
+  getter numbers_won : Array(Int32) do
     @card_numbers.select do |card_number|
       @winning_numbers.find { |n| n == card_number }
     end
