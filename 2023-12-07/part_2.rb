@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 class Hand
-  VALUES = %w[A K Q J T 9 8 7 6 5 4 3 2].each_with_index.to_h
+  VALUES = %w[A K Q T 9 8 7 6 5 4 3 2 J].each_with_index.to_h
   PRECEDENCE = %i[
     five_of_a_kind four_of_a_kind full_house three_of_a_kind two_pair one_pair high_card
   ].each_with_index.to_h
@@ -12,18 +12,19 @@ class Hand
     @cards, @bid = cards.chars, bid.to_i
   end
 
-  def counts      = @counts ||= @cards.tally.values.sort
+  def counts      = @counts ||= @cards.tally.except('J').values.sort
   def card_values = @card_values ||= cards.map { |c| VALUES[c] }
+  def set?(*sets) = sets.any? { |s| counts == s }
 
   def hand_type
-    @hand_type ||= case counts
-    when [5]              then :five_of_a_kind
-    when [1, 4]           then :four_of_a_kind
-    when [2, 3]           then :full_house
-    when [1, 1, 3]        then :three_of_a_kind
-    when [1, 2, 2]        then :two_pair
-    when [1, 1, 1, 2]     then :one_pair
-    when [1, 1, 1, 1, 1]  then :high_card
+    @hand_type ||= case
+    when set?([5], [4], [3], [2], [1], [])     then :five_of_a_kind
+    when set?([1, 4], [1, 3], [1, 2], [1, 1])  then :four_of_a_kind
+    when set?([2, 3], [2, 2])                  then :full_house
+    when set?([1, 1, 3], [1, 1, 2], [1, 1, 1]) then :three_of_a_kind
+    when set?([2, 2], [1, 2, 2])               then :two_pair
+    when set?([1, 1, 1, 2], [1, 1, 1, 1])      then :one_pair
+    when set?([1, 1, 1, 1, 1])                 then :high_card
     end
   end
 
