@@ -3,9 +3,13 @@
 require 'bundler/inline'
 
 gemfile do
+  source "https://rubygems.org"
+
   gem 'http'
   gem 'tzinfo'
   gem 'dotenv'
+  gem 'nokogiri'
+  gem 'reverse_markdown'
 end
 
 require 'date'
@@ -33,6 +37,15 @@ unless File.exist?(File.join(__dir__, folder, 'input.txt'))
   File.open(File.join(__dir__, folder, 'input.txt'), 'w') do |file|
     file.write(input)
   end
+end
+
+unless File.exist?(File.join(__dir__, folder, 'puzzle.md'))
+  puzzle = HTTP
+    .headers('Cookie' => "session=#{ENV['AOC_SESSION']}")
+    .get("https://adventofcode.com/#{year}/day/#{day}")
+
+  puzzle = Nokogiri::HTML(puzzle.to_s).css('article.day-desc')
+  File.write(File.join(__dir__, folder, 'puzzle.md'), ReverseMarkdown.convert(puzzle.to_s))
 end
 
 lang = day % 2 == 0 ? 'cr' : 'rb'
