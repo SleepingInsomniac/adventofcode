@@ -61,9 +61,13 @@ RUBY
 cr_template = <<~CRYSTAL
   #!/usr/bin/env crystal
 
-  File.open(File.join(__DIR__, "input.txt"), "r") do |file|
-    line = file.gets("\\n", true)
-  end
+  file = {% if flag?(:release) %}
+           "input.txt"
+         {% else %}
+           "test_input.txt"
+         {% end %}
+
+  lines = File.read_lines(File.join(__DIR__, file)).map(&.chomp)
 CRYSTAL
 
 unless File.exist?(File.join(__dir__, folder, "part_1.#{lang}"))
