@@ -47,15 +47,12 @@ unless File.exist?(File.join(__dir__, folder, "part_#{part}_answer.txt"))
     .headers('Cookie' => "session=#{ENV['AOC_SESSION']}")
     .post("https://adventofcode.com/#{year}/day/#{day}/answer", form: { level: part, answer: answer })
 
-  puts response.status
-  puts response.to_s
-
   evaluation = Nokogiri::HTML(response.to_s).css('main article p').text
 
   puts evaluation
 
   if evaluation =~ /That\'s the right answer/i
     File.write(File.join(base_path, "part_#{part}_answer.txt"), answer)
-    system `#{File.join(__dir__, '_template.rb')}`
+    system `#{File.join(__dir__, '_template.rb')}` unless part > 1
   end
 end
