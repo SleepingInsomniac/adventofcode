@@ -53,6 +53,6 @@ unless File.exist?(File.join(__dir__, folder, "part_#{part}_answer.txt"))
 
   if evaluation =~ /That\'s the right answer/i
     File.write(File.join(base_path, "part_#{part}_answer.txt"), answer)
-    system `#{File.join(__dir__, '_template.rb')}` unless part > 1
+    system `ruby #{File.join(__dir__, '_template.rb')}` unless part > 1
   end
 end
