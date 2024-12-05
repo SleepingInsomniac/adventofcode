@@ -43,14 +43,8 @@ templates = {
   RUBY
   'cr' => <<~CRYSTAL
     #!/usr/bin/env crystal
-
-    file = {% if flag?(:release) %}
-             "input.txt"
-           {% else %}
-             "test_input.txt"
-           {% end %}
-
-    lines = File.read_lines(File.join(__DIR__, file)).map(&.chomp)
+    input_path = File.join(__DIR__, {% if flag?(:release) %} "input.txt" {% else %} "test_input.txt" {% end %})
+    lines = File.read_lines(input_path).map(&.chomp)
   CRYSTAL
 }
 
