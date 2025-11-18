@@ -1,0 +1,151 @@
+#!/usr/bin/env ruby
+
+require "bundler"
+require "optparse"
+require "date"
+require "fileutils"
+require "erb"
+
+Bundler.require
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Dotenv.load
+timezone = TZInfo::Timezone.get('America/New_York')
+date = timezone.now.to_date
+
+options = {
+  year:  date.year,
+  month: 12,
+  day:   date.day,
+  lang:  "rb",
+}
+
+templates = {
+  "rb" => "ruby.rb.erb",
+  "cr" => "crystal.cr.erb"
+}
+
+subcommand = ARGV.shift
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+optparser = OptionParser.new do |opts|
+  opts.banner = "Usage: aoc [cmd] [options]"
+
+  opts.on("-d", "--day day", "Day to fetch") do |day|
+    options[:day] = day.to_i
+  end
+
+  opts.on("-y", "--year year", "year to fetch (e.g. 2025)") do |year|
+    options[:year] = ((date.year / 100).to_i * 100) + year[-2..].to_i
+  end
+
+  opts.on("-l", "--lang", "Language to use (#{templates.keys.join(", ")})") do |lang|
+    options[:lang] = lang
+  end
+
+  opts.on("-h", "--help", "Show this message") do
+    puts opts
+    exit
+  end
+end.parse!
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+folder = "#{options[:year]}-#{options[:month]}-#{options[:day].to_s.rjust(2, '0')}"
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+case subcommand
+when "new" # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  unless File.exist?(folder)
+    puts "Creating #{folder}"
+    FileUtils.mkdir_p(folder)
+  end
+
+  unless File.exist?(File.join(folder, 'input.txt'))
+    puts "Getting input"
+    input = HTTP
+      .headers('Cookie' => "session=#{ENV['AOC_SESSION']}")
+      .get("https://adventofcode.com/#{options[:year]}/day/#{options[:day]}/input")
+
+    File.write(File.join(folder, 'input.txt'), input)
+  end
+
+  unless File.exist?(File.join(folder, 'part_1.md'))
+    puts "Getting puzzle: part 1"
+    puzzle = HTTP
+      .headers('Cookie' => "session=#{ENV['AOC_SESSION']}")
+      .get("https://adventofcode.com/#{options[:year]}/day/#{options[:day]}")
+
+    puzzle = Nokogiri::HTML(puzzle.to_s).css('article.day-desc')
+    File.write(File.join(folder, 'part_1.md'), ReverseMarkdown.convert(puzzle.to_s))
+  end
+
+  unless File.exist?(File.join(folder, "part_1.#{options[:lang]}"))
+    puts "Writing template: part 1"
+    template = ERB.new(File.read(File.join("templates", templates[options[:lang]])))
+    File.write(File.join(folder, "part_1.#{options[:lang]}"), template.result(binding))
+  end
+
+  if File.exist?(File.join(folder, 'part_1_answer.txt'))
+    unless File.exist?(File.join(folder, 'part_2.md'))
+      puts "Getting puzzle: part 2"
+      puzzle = HTTP
+        .headers('Cookie' => "session=#{ENV['AOC_SESSION']}")
+        .get("https://adventofcode.com/#{options[:year]}/day/#{options[:day]}#part2")
+
+      puzzle = Nokogiri::HTML(puzzle.to_s).css('article.day-desc')[1]
+      File.write(File.join(folder, 'part_2.md'), ReverseMarkdown.convert(puzzle.to_s))
+    end
+
+    unless File.exist?(File.join(folder, "part_2.#{options[:lang]}"))
+      puts "Writing template: part 2"
+      template = ERB.new(File.read(File.join("templates", templates[options[:lang]])))
+      File.write(File.join(folder, "part_2.#{options[:lang]}"), template.result(binding))
+    end
+  end
+when "submit" # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  part = 1
+  if File.exist?(File.join(folder, "part_1_answer.txt"))
+    part = 2
+
+    if File.exist?(File.join(folder, "part_2_answer.txt"))
+      $stderr.puts "Already submitted"
+      exit 1
+    end
+  end
+
+  unless File.exist?(File.join(folder, "part_#{part}_answer.txt"))
+    answer = case options[:lang]
+    when "cr"
+      system "crystal build --release #{File.join(folder, "part_#{part}.cr")} -o #{File.join(folder, "part_#{part}")}"
+      `#{File.join(folder, "part_#{part}")}`.chomp
+    when "rb"
+      `ruby #{File.join(folder, "part_#{part}.rb")}`.chomp
+    else
+      $stderr.puts "Unknown language #{options[:lang]}"
+      exit 1
+    end
+
+    puts "Answer: #{answer}"
+
+    response = HTTP
+      .headers('Cookie' => "session=#{ENV['AOC_SESSION']}")
+      .post("https://adventofcode.com/#{options[:year]}/day/#{options[:day]}/answer", form: { level: part, answer: answer })
+
+    evaluation = Nokogiri::HTML(response.to_s).css('main article p').text
+
+    puts evaluation
+
+    if evaluation =~ /That\'s the right answer/i
+      File.write(File.join(folder, "part_#{part}_answer.txt"), answer)
+    end
+  end
+else # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  $stderr.puts "Unknown subcommand #{subcommand}"
+  $stderr.puts optparser
+  exit 1
+end
