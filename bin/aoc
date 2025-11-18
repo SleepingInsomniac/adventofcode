@@ -105,7 +105,7 @@ when "get" # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     unless File.exist?(File.join(folder, "part_2.#{options[:lang]}"))
       puts "Writing template: part 2"
       template = ERB.new(File.read(File.join("templates", templates[options[:lang]])))
-      File.write(File.join(folder, "part_2.#{options[:lang]}"), template.result({
+      File.write(File.join(folder, "part_2.#{options[:lang]}"), template.result_with_hash({
         puzzle_url: "https://adventofcode.com/#{options[:year]}/day/#{options[:day]}#part2"
       }))
     end
@@ -134,18 +134,22 @@ when "submit" # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       exit 1
     end
 
-    puts "Answer: #{answer}"
+    if $?.success?
+      puts "Answer: #{answer}"
 
-    response = HTTP
-      .headers('Cookie' => "session=#{ENV['AOC_SESSION']}")
-      .post("https://adventofcode.com/#{options[:year]}/day/#{options[:day]}/answer", form: { level: part, answer: answer })
+      response = HTTP
+        .headers('Cookie' => "session=#{ENV['AOC_SESSION']}")
+        .post("https://adventofcode.com/#{options[:year]}/day/#{options[:day]}/answer", form: { level: part, answer: answer })
 
-    evaluation = Nokogiri::HTML(response.to_s).css('main article p').text
+      evaluation = Nokogiri::HTML(response.to_s).css('main article p').text
 
-    puts evaluation
+      puts evaluation
 
-    if evaluation =~ /That\'s the right answer/i
-      File.write(File.join(folder, "part_#{part}_answer.txt"), answer)
+      if evaluation =~ /That\'s the right answer/i
+        File.write(File.join(folder, "part_#{part}_answer.txt"), answer)
+      end
+    else
+      $stderr.puts "Failed: #{answer}"
     end
   end
 else # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
