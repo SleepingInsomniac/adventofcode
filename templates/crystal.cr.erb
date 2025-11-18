@@ -1,4 +1,6 @@
 #!/usr/bin/env crystal
 
+# <%= puzzle_url %>
+
 input_path = File.join(__DIR__, {% if flag?(:release) %} "input.txt" {% else %} "test_input.txt" {% end %})
 lines = File.read_lines(input_path).map(&.chomp)

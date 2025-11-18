@@ -58,7 +58,7 @@ folder = "#{options[:year]}-#{options[:month]}-#{options[:day].to_s.rjust(2, '0'
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 case subcommand
-when "new" # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+when "get" # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   unless File.exist?(folder)
     puts "Creating #{folder}"
     FileUtils.mkdir_p(folder)
@@ -86,7 +86,9 @@ when "new" # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   unless File.exist?(File.join(folder, "part_1.#{options[:lang]}"))
     puts "Writing template: part 1"
     template = ERB.new(File.read(File.join("templates", templates[options[:lang]])))
-    File.write(File.join(folder, "part_1.#{options[:lang]}"), template.result(binding))
+    File.write(File.join(folder, "part_1.#{options[:lang]}"), template.result_with_hash({
+      puzzle_url: "https://adventofcode.com/#{options[:year]}/day/#{options[:day]}"
+    }))
   end
 
   if File.exist?(File.join(folder, 'part_1_answer.txt'))
@@ -103,7 +105,9 @@ when "new" # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     unless File.exist?(File.join(folder, "part_2.#{options[:lang]}"))
       puts "Writing template: part 2"
       template = ERB.new(File.read(File.join("templates", templates[options[:lang]])))
-      File.write(File.join(folder, "part_2.#{options[:lang]}"), template.result(binding))
+      File.write(File.join(folder, "part_2.#{options[:lang]}"), template.result({
+        puzzle_url: "https://adventofcode.com/#{options[:year]}/day/#{options[:day]}#part2"
+      }))
     end
   end
 when "submit" # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
