@@ -8,19 +8,11 @@ def solve(input)
   pointer = 50
   zeros = 0
 
-  while rotation = input.readline&.chomp
-    dir, dist = rotation.split(/(\d+)/)
-    pointer += case dir
-               when 'L' then -dist.to_i
-               when 'R' then dist.to_i
-               else
-                 raise "Invalid direction: #{dir}"
-               end
-
-    pointer %= 100
+  until input.eof?
+    rotation = input.readline&.chomp
+    dist = rotation.gsub('L', '-').gsub('R', '').to_i
+    pointer = (pointer + dist) % 100
     zeros += 1 if pointer == 0
-
-    break if input.eof?
   end
 
   zeros

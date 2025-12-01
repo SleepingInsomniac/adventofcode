@@ -8,7 +8,8 @@ def solve(input, size = 100)
   pointer = 50
   zeros = 0
 
-  while rotation = input.readline&.chomp
+  until input.eof?
+    rotation = input.readline&.chomp
     dist = rotation.gsub('L', '-').gsub('R', '').to_i
     prev_pointer = pointer
     pointer += dist
@@ -20,8 +21,6 @@ def solve(input, size = 100)
     crossings += 1 if pointer == 0
 
     zeros += crossings
-
-    break if input.eof?
   end
 
   zeros
