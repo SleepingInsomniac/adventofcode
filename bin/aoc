@@ -23,7 +23,8 @@ options = {
 
 templates = {
   "rb" => "ruby.rb.erb",
-  "cr" => "crystal.cr.erb"
+  "cr" => "crystal.cr.erb",
+  "swift" => "swift.swift.erb"
 }
 
 subcommand = ARGV.shift
@@ -33,20 +34,20 @@ subcommand = ARGV.shift
 optparser = OptionParser.new do |opts|
   opts.banner = "Usage: aoc [cmd] [options]"
 
-  opts.on("-d", "--day day", "Day to fetch") do |day|
+  opts.on("-d DAY", "--day DAY", "Day to fetch") do |day|
     options[:day] = day.to_i
   end
 
-  opts.on("-y", "--year year", "year to fetch (e.g. 2025)") do |year|
+  opts.on("-y YEAR", "--year YEAR", "year to fetch (e.g. 2025)") do |year|
     options[:year] = ((date.year / 100).to_i * 100) + year[-2..].to_i
   end
 
-  opts.on("-l", "--lang", "Language to use (#{templates.keys.join(", ")})") do |lang|
+  opts.on("-l LANG", "--lang LANG", "Language to use (#{templates.keys.join(", ")})") do |lang|
     options[:lang] = lang
   end
 
   if subcommand == "submit"
-    opts.on("-a", "--answer", "Answer to submit") do |answer|
+    opts.on("-a ANSWER", "--answer ANSWER", "Answer to submit") do |answer|
       options[:answer] = answer
     end
   end
@@ -64,7 +65,7 @@ folder = "#{options[:year]}-#{options[:month]}-#{options[:day].to_s.rjust(2, '0'
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 case subcommand
-when "get" # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+when "get", "init" # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   unless File.exist?(folder)
     puts "Creating #{folder}"
     FileUtils.mkdir_p(folder)

@@ -1,0 +1,27 @@
+// <%= puzzle_url %>
+
+import Foundation
+
+enum Failure: Error {
+case message(String)
+}
+
+func solve(url: URL) async throws -> Int {
+  let handle = try FileHandle(forReadingFrom: url)
+  defer { try? handle.close() }
+
+  var solution : Int = 0
+
+  for try await line in handle.bytes.lines {
+    print(line)
+  }
+
+  return solution
+}
+
+let file = URL(fileURLWithPath: #filePath)
+let dir  = file.deletingLastPathComponent()
+let target = dir.appendingPathComponent("input.txt")
+
+let result = try await solve(url: target)
+print(result)
