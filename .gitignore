@@ -1,10 +1,11 @@
 .env
-*/puzzle.md
 # Built executables
 */part_1
 */part_2
 */*.dwarf
+# answers
 */part_1_answer.txt
 */part_2_answer.txt
+# Puzzle info
 */input.txt
 */part_*.md

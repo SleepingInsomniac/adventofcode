@@ -45,6 +45,12 @@ optparser = OptionParser.new do |opts|
     options[:lang] = lang
   end
 
+  if subcommand == "submit"
+    opts.on("-a", "--answer", "Answer to submit") do |answer|
+      options[:answer] = answer
+    end
+  end
+
   opts.on("-h", "--help", "Show this message") do
     puts opts
     exit
@@ -123,7 +129,7 @@ when "submit" # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   end
 
   unless File.exist?(File.join(folder, "part_#{part}_answer.txt"))
-    answer = case options[:lang]
+    answer = options[:answer] || case options[:lang]
     when "cr"
       system "crystal build --release #{File.join(folder, "part_#{part}.cr")} -o #{File.join(folder, "part_#{part}")}"
       `#{File.join(folder, "part_#{part}")}`.chomp
