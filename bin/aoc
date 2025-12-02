@@ -24,7 +24,7 @@ options = {
   year:  date.year,
   month: 12,
   day:   date.day,
-  lang:  templates.keys.sample,
+  lang:  nil,
 }
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -70,6 +70,9 @@ end.parse!
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 folder = "#{options[:year]}-#{options[:month]}-#{options[:day].to_s.rjust(2, '0')}"
+
+options[:lang] ||= Dir.glob(File.join(folder, "*.{#{templates.keys.join(',')}}")).first&.split('.')&.last
+options[:lang] ||= templates.keys.sample
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

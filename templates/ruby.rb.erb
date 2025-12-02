@@ -18,7 +18,7 @@ end.to_h
 
 if tests.values.all? { |v| v[0] }
   File.open(File.join(__dir__, 'input.txt'), 'r') do |file|
-    # line = file.readline.chomp
+    puts solve(file)
   end
 else
   $stderr.puts tests
