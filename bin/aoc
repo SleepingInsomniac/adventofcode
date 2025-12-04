@@ -25,6 +25,7 @@ options = {
   month: 12,
   day:   date.day,
   lang:  nil,
+  manually_submitted: false
 }
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -58,6 +59,7 @@ optparser = OptionParser.new do |opts|
   if subcommand == "submit"
     opts.on("-a ANSWER", "--answer ANSWER", "Answer to submit") do |answer|
       options[:answer] = answer
+      options[:manually_submitted] = true
     end
   end
 
@@ -153,7 +155,7 @@ when "submit" # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       exit 1
     end
 
-    if $?.success?
+    if options[:manually_submitted] || $?.success?
       puts "Answer: #{answer}"
 
       response = HTTP
