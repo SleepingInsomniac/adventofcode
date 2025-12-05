@@ -2,24 +2,32 @@
 
 # <%= puzzle_url %>
 
+require "stringio"
+
 def solve(input)
-  # ...
 end
 
 # Tests ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+test_input = StringIO.new(<<~TEST_INPUT)
+TEST_INPUT
+
 tests = {
-}.map do |(input, expectation)|
+  test_input => 3
+}.each do |(input, expectation)|
   result = solve(input)
-  [input, [result == expectation, "Expected #{result} to equal #{expectation}"]]
-end.to_h
+  unless result == expectation
+    $stderr.puts <<~ERROR
+      Expected: #{expectation}
+        Actual: #{result}
+    ERROR
+
+    exit 1
+  end
+end
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-if tests.values.all? { |v| v[0] }
-  File.open(File.join(__dir__, 'input.txt'), 'r') do |file|
-    puts solve(file)
-  end
-else
-  $stderr.puts tests
+File.open(File.join(__dir__, 'input.txt'), 'r') do |file|
+  puts solve(file)
 end
