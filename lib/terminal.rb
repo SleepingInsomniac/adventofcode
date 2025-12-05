@@ -1,6 +1,8 @@
 require_relative "./flags"
 
 class Terminal
+  TIOCGWINSZ = 0x40087468
+
   module CursorShape
     BLINKING_BLOCK     = 1
     STEADY_BLOCK       = 2
@@ -20,6 +22,14 @@ class Terminal
     hidden
     strikethrough
   ]
+
+  def self.size
+    buf = [0, 0, 0, 0].pack("SSSS")
+    rc = io.ioctl(TIOCGWINSZ, buf)
+    raise "ioctl failed" if rc < 0
+    rows, cols, xpx, ypx = buf.unpack("SSSS")
+    { rows: rows, cols: cols, x_pixels: xpx, y_pixels: ypx }
+  end
 
   def initialize(io = $stdout)
     @io = io
