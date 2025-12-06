@@ -7,16 +7,16 @@ case message(String)
 }
 
 func solve(url: URL) async throws -> Int {
-  let handle = try FileHandle(forReadingFrom: url)
-  defer { try? handle.close() }
+    let handle = try FileHandle(forReadingFrom: url)
+    defer { try? handle.close() }
 
-  var solution : Int = 0
+    var solution : Int = 0
 
-  for try await line in handle.bytes.lines {
-    print(line)
-  }
+    for try await line in handle.bytes.lines {
+        print(line)
+    }
 
-  return solution
+    return solution
 }
 
 let file = URL(fileURLWithPath: #filePath)
