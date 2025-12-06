@@ -6,19 +6,9 @@ require "stringio"
 
 def solve(input)
   lines = input.readlines(chomp: true)
-  operations = lines.pop.split(/\s+/).map(&:to_sym)
+  ops = lines.pop.split(/\s+/).map(&:to_sym)
   numbers = lines.map { |l| l.strip.split(/\s+/).map(&:to_i) }
-  totals = Array.new(operations.size) { |i| operations[i] == :+ ? 0 : 1 }
-  numbers.each do |row|
-    row.each.with_index do |n, i|
-      op = operations[i]
-      case op
-      when :"*" then totals[i] *= n
-      when :+ then totals[i] += n
-      end
-    end
-  end
-  totals.sum
+    .transpose.map.with_index { |col, i| col.reduce(ops[i]) }.sum
 end
 
 # Tests ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
