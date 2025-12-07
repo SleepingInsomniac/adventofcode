@@ -84,6 +84,11 @@ class Terminal
     put("#{@y + 1};#{@x + 1}H")
   end
 
+  def []=(x, y, value)
+    move(x, y)
+    self.print(value)
+  end
+
   def trunc               = put(ANSI::CURSOR::TRUNK) # Delete the rest of the line from cursor pos
   def clear               = put(ANSI::CLEAR::ALL)    # Clear the screen
   def home                = put(ANSI::CURSOR::HOME)  # Return to top left)
