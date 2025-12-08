@@ -48,7 +48,7 @@ class Manifold
     s
   end
 
-  def propigate
+  def propagate
     @splits = 0
     puts self
     each_slice(@width) do |row|
@@ -78,7 +78,7 @@ def solve(input)
   $t.in_alt_buffer do
     $t.hidden_cursor do
       m = Manifold.parse(input)
-      m.propigate
+      m.propagate
     end
   end
 end
