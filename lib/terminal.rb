@@ -149,7 +149,7 @@ class Terminal
     self
   end
 
-  def with_color(fore, back)
+  def with_color(fore = nil, back = nil)
     old_fore = @fore
     old_back = @back
     self.fore = fore
