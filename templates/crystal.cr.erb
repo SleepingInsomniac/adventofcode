@@ -2,5 +2,34 @@
 
 # <%= puzzle_url %>
 
-input_path = File.join(__DIR__, {% if flag?(:release) %} "input.txt" {% else %} "test_input.txt" {% end %})
-lines = File.read_lines(input_path).map(&.chomp)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+def solve(input)
+  while line = input.gets(chomp: true)
+  end
+end
+
+# Tests ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+test_input = IO::Memory.new(<<-TEST_INPUT)
+TEST_INPUT
+
+tests = {
+  test_input => 0
+}.each do |(input, expectation)|
+  result = solve(input)
+  unless result == expectation
+    STDERR.puts <<-ERROR
+      Expected: #{expectation}
+        Actual: #{result}
+    ERROR
+
+    exit 1
+  end
+end
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+File.open(File.join(__DIR__, "input.txt"), "r") do |file|
+  puts solve(file)
+end
