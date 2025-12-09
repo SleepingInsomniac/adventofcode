@@ -1,4 +1,6 @@
 class DotDisplay
+  include Enumerable
+
   MASKS = [
     0b00000001,
     0b00001000,
@@ -63,6 +65,18 @@ class DotDisplay
       end
       string
     end.join("\n")
+  end
+
+  def each
+    0.upto(@height - 1) do |y|
+      0.upto(@width - 1) do |x|
+        yield [x, y]
+      end
+    end
+  end
+
+  def char_at(x, y)
+    self.class.braille_char(@bytes[(y / 4) * (@width / 2) + (x / 2)])
   end
 
   private
