@@ -37,15 +37,12 @@ def solve(input)
 
   while line = input.gets(chomp: true)
     label, *outputs = line.strip.split(/\W+/)
-    devices[label] = Device.new(label)
-  end
+    parent = devices[label] ||= Device.new(label)
 
-  devices["out"] = Device.new("out")
-  input.rewind
-
-  while line = input.gets(chomp: true)
-    label, *outputs = line.strip.split(/\W+/)
-    outputs.each { |ol| devices[label] << devices[ol] }
+    outputs.each do |ol|
+      child = devices[ol] ||= Device.new(ol)
+      parent << child
+    end
   end
 
   paths(from: devices["svr"], to: devices["out"])

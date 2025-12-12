@@ -8,8 +8,7 @@ def solve(input)
   devices = {} of String => Array(String)
 
   while line = input.gets(chomp: true)
-    outputs = line.strip.split(/\W+/)
-    label = outputs.shift
+    label, *outputs = line.strip.split(/\W+/)
     devices[label] = outputs
   end
 
