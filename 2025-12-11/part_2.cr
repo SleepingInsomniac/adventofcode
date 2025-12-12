@@ -16,40 +16,33 @@ class Node(T)
   end
 end
 
-alias Dev = Node(String)
+alias Device = Node(String)
 
-def paths(from : Dev, to : Dev, path = [] of Dev, results = [] of Array(Dev), including = [] of Dev)
-  path << from
+def paths(from : Device, to : Device, dac = false, fft = false, memo = {} of Tuple(Device, Bool, Bool) => UInt64)
+  dac = true if from.value == "dac"
+  fft = true if from.value == "fft"
 
-  if from == to
-    print "\r", path.map(&.value).join(" -> ")
-    if including.all? { |n| path.includes?(n) }
-      puts
-      results << path.dup
-    end
-  else
-    from.children.each do |child|
-      paths(child, to, path, results, including) unless path.includes?(child)
-    end
-  end
+  return dac && fft ? 1u64 : 0u64 if from == to
 
-  path.pop
-  results
+  key = {from, dac, fft}
+  return memo[key] if memo[key]?
+
+  memo[key] = from.children.sum(0u64) { |c| paths(c, to, dac, fft, memo) }
 end
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def solve(input)
-  devices = {} of String => Node(String)
+  devices = {} of String => Device
 
   while line = input.gets(chomp: true)
     outputs = line.strip.split(/\W+/)
     label = outputs.shift
 
-    devices[label] = Node.new(label)
+    devices[label] = Device.new(label)
   end
 
-  devices["out"] = Node.new("out")
+  devices["out"] = Device.new("out")
   input.rewind
 
   while line = input.gets(chomp: true)
@@ -60,11 +53,7 @@ def solve(input)
     end
   end
 
-  # devices.each do |_, dev|
-  #   puts "#{dev.parents.map(&.value).join(", ")} <- (#{dev.value}) -> #{dev.children.map(&.value).join(", ")}"
-  # end
-
-  paths(from: devices["svr"], to: devices["out"], including: [devices["dac"], devices["fft"]]).size
+  paths(from: devices["svr"], to: devices["out"])
 end
 
 # Tests ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
