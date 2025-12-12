@@ -36,9 +36,7 @@ def solve(input)
   devices = {} of String => Device
 
   while line = input.gets(chomp: true)
-    outputs = line.strip.split(/\W+/)
-    label = outputs.shift
-
+    label, *outputs = line.strip.split(/\W+/)
     devices[label] = Device.new(label)
   end
 
@@ -46,11 +44,8 @@ def solve(input)
   input.rewind
 
   while line = input.gets(chomp: true)
-    outputs = line.strip.split(/\W+/)
-    label = outputs.shift
-    outputs.each do |ol|
-      devices[label] << devices[ol]
-    end
+    label, *outputs = line.strip.split(/\W+/)
+    outputs.each { |ol| devices[label] << devices[ol] }
   end
 
   paths(from: devices["svr"], to: devices["out"])
