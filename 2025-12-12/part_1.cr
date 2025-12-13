@@ -27,7 +27,7 @@ struct Shape(W, H)
     @shape[y * W + x] = value
   end
 
-  def mass
+  def volume
     @shape.count { |b| b }
   end
 
@@ -100,7 +100,7 @@ class Region
   end
 
   def presents_fit?
-    return false if @presents.sum { |p, c| p.mass * c } > area
+    return false if @presents.sum { |p, c| p.volume * c } > area
     true
   end
 end
@@ -125,7 +125,7 @@ def solve(input)
   # regions.each do |r|
   #   puts "#{r.width}x#{r.height} = #{r.area}"
   #   puts "------"
-  #   r.presents.each_with_index { |(p, c), i| puts "#{i}: #{p.mass}x#{c} = #{p.mass * c}" }
+  #   r.presents.each_with_index { |(p, c), i| puts "#{i}: #{p.volume}x#{c} = #{p.volume * c}" }
   #   puts
   # end
 
